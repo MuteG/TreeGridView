@@ -37,8 +37,13 @@ namespace AdvancedDataGridView
 
         private Padding previousPadding;
         private int imageWidth = 0, imageHeight = 0;
+        private bool isSited;
 
-        internal bool IsSited { get; private set; }
+        internal bool IsSited
+        {
+            get { return isSited; }
+            private set { isSited = value; }
+        }
 
         public TreeGridCell()
         {

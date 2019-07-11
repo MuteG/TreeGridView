@@ -27,6 +27,11 @@ namespace AdvancedDataGridView
         internal int imageIndex;
 
         private TreeGridNodeCollection childrenNodes = null;
+        private bool isCheckStateChangedByProgram;
+        private bool isExpanded;
+        private TreeGridView grid;
+        private TreeGridNode parent;
+        private bool isSitedProperty;
 
         public TreeGridNode()
         {
@@ -162,12 +167,20 @@ namespace AdvancedDataGridView
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        internal bool IsCheckStateChangedByProgram { get; set; }
+        internal bool IsCheckStateChangedByProgram
+        {
+            get { return isCheckStateChangedByProgram; }
+            set { isCheckStateChangedByProgram = value; }
+        }
 
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool IsExpanded { get; private set; }
+        public bool IsExpanded
+        {
+            get { return isExpanded; }
+            private set { isExpanded = value; }
+        }
 
         [Category("Appearance")]
         [Description("..."), DefaultValue(-1)]
@@ -277,11 +290,19 @@ namespace AdvancedDataGridView
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public TreeGridView Grid { get; internal set; }
+        public TreeGridView Grid
+        {
+            get { return grid; }
+            internal set { grid = value; }
+        }
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public TreeGridNode Parent { get; internal set; }
+        public TreeGridNode Parent
+        {
+            get { return parent; }
+            internal set { parent = value; }
+        }
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -295,7 +316,11 @@ namespace AdvancedDataGridView
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool IsSited { get; private set; }
+        public bool IsSited
+        {
+            get { return isSitedProperty; }
+            private set { isSitedProperty = value; }
+        }
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
