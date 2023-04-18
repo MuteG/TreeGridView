@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpandableGridView", "ExpandableGridView.csproj", "{2EFE526F-79B3-49BC-9575-A7B258C59BB5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "Sample\Sample.csproj", "{1F5E0904-0A06-453E-AFFD-3226F71D19BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TreeGridView", "TreeGridView\TreeGridView.csproj", "{2EFE526F-79B3-49BC-9575-A7B258C59BB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,6 +13,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1F5E0904-0A06-453E-AFFD-3226F71D19BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F5E0904-0A06-453E-AFFD-3226F71D19BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F5E0904-0A06-453E-AFFD-3226F71D19BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F5E0904-0A06-453E-AFFD-3226F71D19BA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2EFE526F-79B3-49BC-9575-A7B258C59BB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2EFE526F-79B3-49BC-9575-A7B258C59BB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2EFE526F-79B3-49BC-9575-A7B258C59BB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -18,5 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A117C139-A485-43F9-AF36-6EA614AFB42D}
 	EndGlobalSection
 EndGlobal

@@ -8,52 +8,53 @@
  *  PARTICULAR PURPOSE.
  * 
  * ------------------------------------------------------------------- */
-using System;
+
 using System.ComponentModel;
 using System.ComponentModel.Design;
-using System.Diagnostics;
 using System.Drawing.Design;
-using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
+using System.Windows.Forms.Design;
 
-namespace AdvancedDataGridView
+namespace System.Windows.Forms
 {
     /// <summary>
-    /// Summary description for TreeGridView.
+    /// 树形数据表格
     /// </summary>
-    [System.ComponentModel.DesignerCategory("code"),
-    Designer(typeof(System.Windows.Forms.Design.ControlDesigner)),
-    ComplexBindingProperties(),
+    [DesignerCategory("code"),
+    Designer(typeof(ControlDesigner)),
+    ComplexBindingProperties,
     Docking(DockingBehavior.Ask)]
     public class TreeGridView : DataGridView
     {
-        private TreeGridNode root;
-        private TreeGridColumn expandableColumn;
-        internal ImageList imageList;
-        private bool inExpandCollapse = false;
-        internal bool inExpandCollapseMouseCapture = false;
-        private Control hideScrollBarControl;
-        private bool showLines = true;
-        private bool showCheckBox = true;
-        private bool virtualNodes = false;
+        private TreeGridColumn _expandableColumn;
+        private ImageList _imageList;
+        internal bool InExpandCollapseMouseCapture;
+        private Control _hideScrollBarControl;
+        private bool _showLines = true;
+        private bool _showCheckBox = true;
+        private bool _virtualNodes;
 
         #region Constructor
         public TreeGridView()
         {
             // Control when edit occurs because edit mode shouldn't start when expanding/collapsing
-            this.EditMode = DataGridViewEditMode.EditProgrammatically;
-            this.RowTemplate = new TreeGridNode() as DataGridViewRow;
+            EditMode = DataGridViewEditMode.EditProgrammatically;
+            RowTemplate = new TreeGridNode();
             // This sample does not support adding or deleting rows by the user.
-            this.AllowUserToAddRows = false;
-            this.AllowUserToDeleteRows = false;
-            this.root = new TreeGridNode();
-            this.root.Grid = this;
-
-            // Ensures that all rows are added unshared by listening to the CollectionChanged event.
-            base.Rows.CollectionChanged += delegate(object sender, System.ComponentModel.CollectionChangeEventArgs e) { };
-
-            this.MultiSelect = false;
+            AllowUserToAddRows = false;
+            AllowUserToDeleteRows = false;
+            MultiSelect = false;
+            _virtualNodes = true;
+            Nodes = new TreeGridNodeCollection(null)
+            {
+                Grid = this
+            };
+            Columns.Add(new TreeGridColumn
+            {
+                Name = "colDefault",
+                HeaderText = string.Empty
+            });
         }
+
         #endregion
 
         #region Keyboard F2 to begin edit support
@@ -64,77 +65,30 @@ namespace AdvancedDataGridView
             base.OnKeyDown(e);
             if (!e.Handled)
             {
-                if (e.KeyCode == Keys.F2 && this.CurrentCellAddress.X > -1 && this.CurrentCellAddress.Y > -1)
+                if (e.KeyCode == Keys.F2 && CurrentCellAddress.X > -1 && CurrentCellAddress.Y > -1)
                 {
-                    if (!this.CurrentCell.Displayed)
+                    if (!CurrentCell.Displayed)
                     {
-                        this.FirstDisplayedScrollingRowIndex = this.CurrentCellAddress.Y;
+                        FirstDisplayedScrollingRowIndex = CurrentCellAddress.Y;
                     }
-                    else
-                    {
-                        // TODO:calculate if the cell is partially offscreen and if so scroll into view
-                    }
-                    this.SelectionMode = DataGridViewSelectionMode.CellSelect;
-                    this.BeginEdit(true);
+
+                    // TODO:calculate if the cell is partially offscreen and if so scroll into view
+                    SelectionMode = DataGridViewSelectionMode.CellSelect;
+                    BeginEdit(true);
                 }
-                else if (e.KeyCode == Keys.Enter && !this.IsCurrentCellInEditMode)
+                else if (e.KeyCode == Keys.Enter && !IsCurrentCellInEditMode)
                 {
-                    this.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-                    this.CurrentCell.OwningRow.Selected = true;
+                    SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+                    CurrentCell.OwningRow.Selected = true;
                 }
             }
         }
         #endregion
 
-        #region Shadow and hide DGV properties
-
-        // This sample does not support databinding
-        [Browsable(false),
-        DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
-        EditorBrowsable(EditorBrowsableState.Never)]
-        public new object DataSource
+        protected override DataGridViewRowCollection CreateRowsInstance()
         {
-            get { return null; }
-            set { throw new NotSupportedException("The TreeGridView does not support databinding"); }
+            return new TreeGridViewRowCollection(this);
         }
-
-        [Browsable(false),
-        DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
-        EditorBrowsable(EditorBrowsableState.Never)]
-        public new object DataMember
-        {
-            get { return null; }
-            set { throw new NotSupportedException("The TreeGridView does not support databinding"); }
-        }
-
-        [Browsable(false),
-        DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
-        EditorBrowsable(EditorBrowsableState.Never)]
-        public new DataGridViewRowCollection Rows
-        {
-            get { return base.Rows; }
-        }
-
-        [Browsable(false),
-        DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
-        EditorBrowsable(EditorBrowsableState.Never)]
-        public new bool VirtualMode
-        {
-            get { return false; }
-            set { throw new NotSupportedException("The TreeGridView does not support virtual mode"); }
-        }
-
-        // none of the rows/nodes created use the row template, so it is hidden.
-        [Browsable(false),
-        DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden),
-        EditorBrowsable(EditorBrowsableState.Never)]
-        public new DataGridViewRow RowTemplate
-        {
-            get { return base.RowTemplate; }
-            set { base.RowTemplate = value; }
-        }
-
-        #endregion
 
         #region Public methods
         [Description("Returns the TreeGridNode for the given DataGridViewRow")]
@@ -146,8 +100,9 @@ namespace AdvancedDataGridView
         [Description("Returns the TreeGridNode for the given DataGridViewRow")]
         public TreeGridNode GetNodeForRow(int index)
         {
-            return GetNodeForRow(base.Rows[index]);
+            return GetNodeForRow(Rows[index]);
         }
+        
         #endregion
 
         #region Public properties
@@ -155,13 +110,7 @@ namespace AdvancedDataGridView
         Description("The collection of root nodes in the treelist."),
         DesignerSerializationVisibility(DesignerSerializationVisibility.Content),
         Editor(typeof(CollectionEditor), typeof(UITypeEditor))]
-        public TreeGridNodeCollection Nodes
-        {
-            get
-            {
-                return this.root.Nodes;
-            }
-        }
+        public TreeGridNodeCollection Nodes { get; }
 
         public new TreeGridNode CurrentRow
         {
@@ -175,15 +124,15 @@ namespace AdvancedDataGridView
         Description("Causes nodes to always show as expandable. Use the NodeExpanding event to add nodes.")]
         public bool VirtualNodes
         {
-            get { return virtualNodes; }
-            set { virtualNodes = value; }
+            get { return _virtualNodes; }
+            set { _virtualNodes = value; }
         }
 
         public TreeGridNode CurrentNode
         {
             get
             {
-                return this.CurrentRow;
+                return CurrentRow;
             }
         }
 
@@ -191,13 +140,13 @@ namespace AdvancedDataGridView
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         public bool ShowLines
         {
-            get { return this.showLines; }
+            get { return _showLines; }
             set
             {
-                if (value != this.showLines)
+                if (value != _showLines)
                 {
-                    this.showLines = value;
-                    this.Invalidate();
+                    _showLines = value;
+                    Invalidate();
                 }
             }
         }
@@ -206,13 +155,13 @@ namespace AdvancedDataGridView
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         public bool ShowCheckBox
         {
-            get { return this.showCheckBox; }
+            get { return _showCheckBox; }
             set
             {
-                if (value != this.showCheckBox)
+                if (value != _showCheckBox)
                 {
-                    this.showCheckBox = value;
-                    this.Invalidate();
+                    _showCheckBox = value;
+                    Invalidate();
                 }
             }
         }
@@ -223,23 +172,21 @@ namespace AdvancedDataGridView
         {
             get
             {
-                if (this.SelectedRows.Count > 0)
+                if (SelectedRows.Count > 0)
                 {
-                    return this.SelectedRows[0] as TreeGridNode;
+                    return SelectedRows[0] as TreeGridNode;
                 }
-                else
-                {
-                    return null;
-                }
+
+                return null;
             }
         }
 
         public ImageList ImageList
         {
-            get { return this.imageList; }
+            get { return _imageList; }
             set
             {
-                this.imageList = value;
+                _imageList = value;
                 //TODO: should we invalidate cell styles when setting the image list?
 
             }
@@ -247,14 +194,15 @@ namespace AdvancedDataGridView
 
         public new int RowCount
         {
-            get { return this.Nodes.Count; }
+            get { return Nodes.Count; }
             set
             {
                 for (int i = 0; i < value; i++)
-                    this.Nodes.Add(new TreeGridNode());
+                    Nodes.Add(new TreeGridNode());
 
             }
         }
+
         #endregion
 
         #region Site nodes and collapse/expand support
@@ -266,7 +214,7 @@ namespace AdvancedDataGridView
             TreeGridNode row;
             while (count >= 0)
             {
-                row = base.Rows[e.RowIndex + count] as TreeGridNode;
+                row = Rows[e.RowIndex + count] as TreeGridNode;
                 if (row != null)
                 {
                     row.Site();
@@ -279,13 +227,13 @@ namespace AdvancedDataGridView
         {
             // used to keep extra mouse moves from selecting more rows when collapsing
             base.OnMouseUp(e);
-            this.inExpandCollapseMouseCapture = false;
+            InExpandCollapseMouseCapture = false;
         }
         protected override void OnMouseMove(MouseEventArgs e)
         {
             // while we are expanding and collapsing a node mouse moves are
             // supressed to keep selections from being messed up.
-            if (!this.inExpandCollapseMouseCapture)
+            if (!InExpandCollapseMouseCapture)
                 base.OnMouseMove(e);
         }
         #endregion
@@ -299,7 +247,7 @@ namespace AdvancedDataGridView
 
         protected internal virtual void OnNodeExpanding(ExpandingEventArgs e)
         {
-            if (this.NodeExpanding != null)
+            if (NodeExpanding != null)
             {
                 NodeExpanding(this, e);
             }
@@ -307,14 +255,14 @@ namespace AdvancedDataGridView
         protected internal virtual void OnNodeExpanded(TreeGridNode node)
         {
             ExpandedEventArgs e = new ExpandedEventArgs(node);
-            if (this.NodeExpanded != null)
+            if (NodeExpanded != null)
             {
                 NodeExpanded(this, e);
             }
         }
         protected internal virtual void OnNodeCollapsing(CollapsingEventArgs e)
         {
-            if (this.NodeCollapsing != null)
+            if (NodeCollapsing != null)
             {
                 NodeCollapsing(this, e);
             }
@@ -323,7 +271,7 @@ namespace AdvancedDataGridView
         protected internal virtual void OnNodeCollapsed(TreeGridNode node)
         {
             CollapsedEventArgs e = new CollapsedEventArgs(node);
-            if (this.NodeCollapsed != null)
+            if (NodeCollapsed != null)
             {
                 NodeCollapsed(this, e);
             }
@@ -331,9 +279,9 @@ namespace AdvancedDataGridView
         protected internal virtual void OnNodeChecked(TreeGridNode node, bool isChangedByProgram)
         {
             CheckedEventArgs e = new CheckedEventArgs(node, isChangedByProgram);
-            if (this.NodeExpanded != null)
+            if (NodeExpanded != null)
             {
-                NodeChecked(this, e);
+                NodeChecked?.Invoke(this, e);
             }
         }
         #endregion
@@ -349,40 +297,24 @@ namespace AdvancedDataGridView
             base.OnHandleCreated(e);
 
             // this control is used to temporarly hide the vertical scroll bar
-            hideScrollBarControl = new Control();
-            hideScrollBarControl.Visible = false;
-            hideScrollBarControl.Enabled = false;
-            hideScrollBarControl.TabStop = false;
+            _hideScrollBarControl = new Control();
+            _hideScrollBarControl.Visible = false;
+            _hideScrollBarControl.Enabled = false;
+            _hideScrollBarControl.TabStop = false;
             // control is disposed automatically when the grid is disposed
-            this.Controls.Add(hideScrollBarControl);
+            Controls.Add(_hideScrollBarControl);
         }
 
         protected override void OnRowEnter(DataGridViewCellEventArgs e)
         {
             // ensure full row select
             base.OnRowEnter(e);
-            if (this.SelectionMode == DataGridViewSelectionMode.CellSelect ||
-                (this.SelectionMode == DataGridViewSelectionMode.FullRowSelect &&
-                base.Rows[e.RowIndex].Selected == false))
+            if (SelectionMode == DataGridViewSelectionMode.CellSelect ||
+                (SelectionMode == DataGridViewSelectionMode.FullRowSelect &&
+                Rows[e.RowIndex].Selected == false))
             {
-                this.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-                base.Rows[e.RowIndex].Selected = true;
-            }
-        }
-
-        private void LockVerticalScrollBarUpdate(bool lockUpdate/*, bool delayed*/)
-        {
-            // Temporarly hide/show the vertical scroll bar by changing its parent
-            if (!this.inExpandCollapse)
-            {
-                if (lockUpdate)
-                {
-                    this.VerticalScrollBar.Parent = hideScrollBarControl;
-                }
-                else
-                {
-                    this.VerticalScrollBar.Parent = this;
-                }
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+                Rows[e.RowIndex].Selected = true;
             }
         }
 
@@ -390,16 +322,13 @@ namespace AdvancedDataGridView
         {
             if (typeof(TreeGridColumn).IsAssignableFrom(e.Column.GetType()))
             {
-                if (expandableColumn == null)
+                if (_expandableColumn == null)
                 {
                     // identify the expanding column.			
-                    expandableColumn = (TreeGridColumn)e.Column;
+                    _expandableColumn = (TreeGridColumn)e.Column;
                 }
-                else
-                {
-                    // this.Columns.Remove(e.Column);
-                    //throw new InvalidOperationException("Only one TreeGridColumn per TreeGridView is supported.");
-                }
+                // this.Columns.Remove(e.Column);
+                //throw new InvalidOperationException("Only one TreeGridColumn per TreeGridView is supported.");
             }
 
             // Expandable Grid doesn't support sorting. This is just a limitation of the sample.

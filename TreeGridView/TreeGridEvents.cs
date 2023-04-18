@@ -7,42 +7,30 @@
 //IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
 //PARTICULAR PURPOSE.
 //---------------------------------------------------------------------
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace AdvancedDataGridView
+using System.ComponentModel;
+
+namespace System.Windows.Forms
 {
 	public class TreeGridNodeEventBase : EventArgs
 	{
-		private TreeGridNode _node;
-
-		public TreeGridNodeEventBase(TreeGridNode node)
+        public TreeGridNodeEventBase(TreeGridNode node)
 		{
-			this._node = node;
+			Node = node;
 		}
 
-		public TreeGridNode Node
-		{
-			get { return _node; }
-		}
-	}
-	public class CollapsingEventArgs : System.ComponentModel.CancelEventArgs
+		public TreeGridNode Node { get; }
+    }
+
+	public class CollapsingEventArgs : CancelEventArgs
 	{
-		private TreeGridNode _node;
-
-		private CollapsingEventArgs() { }
-		public CollapsingEventArgs(TreeGridNode node)
-			: base()
+        public CollapsingEventArgs(TreeGridNode node)
 		{
-			this._node = node;
+			Node = node;
 		}
-		public TreeGridNode Node
-		{
-			get { return _node; }
-		}
+		public TreeGridNode Node { get; }
+    }
 
-	}
 	public class CollapsedEventArgs : TreeGridNodeEventBase
 	{
 		public CollapsedEventArgs(TreeGridNode node)
@@ -51,21 +39,15 @@ namespace AdvancedDataGridView
 		}
 	}
 
-	public class ExpandingEventArgs:System.ComponentModel.CancelEventArgs
+	public class ExpandingEventArgs:CancelEventArgs
 	{
-		private TreeGridNode _node;
-
-		private ExpandingEventArgs() { }
-		public ExpandingEventArgs(TreeGridNode node):base()
-		{
-			this._node = node;
+        public ExpandingEventArgs(TreeGridNode node)
+        {
+			Node = node;
 		}
-		public TreeGridNode Node
-		{
-			get { return _node; }
-		}
+		public TreeGridNode Node { get; }
+    }
 
-	}
 	public class ExpandedEventArgs : TreeGridNodeEventBase
 	{
 		public ExpandedEventArgs(TreeGridNode node):base(node)
@@ -75,8 +57,6 @@ namespace AdvancedDataGridView
 
     public class CheckedEventArgs : TreeGridNodeEventBase
     {
-        private bool isChangedByProgram;
-
         public CheckedEventArgs(TreeGridNode node)
             : base(node)
         {
@@ -85,22 +65,18 @@ namespace AdvancedDataGridView
         public CheckedEventArgs(TreeGridNode node, bool isChangedByProgram)
             : this(node)
         {
-            this.isChangedByProgram = isChangedByProgram;
+            IsChangedByProgram = isChangedByProgram;
         }
 
-        public bool IsChangedByProgram
-        {
-            get
-            {
-                return this.isChangedByProgram;
-            }
-        }
+        public bool IsChangedByProgram { get; }
     }
 
 	public delegate void ExpandingEventHandler(object sender, ExpandingEventArgs e);
+
 	public delegate void ExpandedEventHandler(object sender, ExpandedEventArgs e);
 
 	public delegate void CollapsingEventHandler(object sender, CollapsingEventArgs e);
+
 	public delegate void CollapsedEventHandler(object sender, CollapsedEventArgs e);
 
     public delegate void CheckedEventHandler(object sender, CheckedEventArgs e);

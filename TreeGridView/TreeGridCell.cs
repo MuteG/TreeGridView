@@ -8,12 +8,12 @@
  *  PARTICULAR PURPOSE.
  * 
  * ------------------------------------------------------------------- */
-using System;
+
 using System.Drawing;
-using System.Windows.Forms;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms.VisualStyles;
 
-namespace AdvancedDataGridView
+namespace System.Windows.Forms
 {
     /// <summary>
     /// 用来显示树形结构的单元格
@@ -32,97 +32,94 @@ namespace AdvancedDataGridView
         /// 字符宽度
         /// </summary>
         private const int GLYPH_WIDTH = 15;
-        private readonly static VisualStyleRenderer RENDERER_OPEN = new VisualStyleRenderer(VisualStyleElement.TreeView.Glyph.Opened);
-        private readonly static VisualStyleRenderer RENDERER_CLOSED = new VisualStyleRenderer(VisualStyleElement.TreeView.Glyph.Closed);
+        private static readonly VisualStyleRenderer RENDERER_OPEN = new VisualStyleRenderer(VisualStyleElement.TreeView.Glyph.Opened);
+        private static readonly VisualStyleRenderer RENDERER_CLOSED = new VisualStyleRenderer(VisualStyleElement.TreeView.Glyph.Closed);
 
-        private Padding previousPadding;
-        private int imageWidth = 0, imageHeight = 0;
-        private bool isSited;
-
-        internal bool IsSited
-        {
-            get { return isSited; }
-            private set { isSited = value; }
-        }
+        private Padding _previousPadding;
+        private int _imageWidth, _imageHeight;
 
         public TreeGridCell()
         {
-            this.IsSited = false;
+            IsSited = false;
         }
 
-        internal void UnSited()
-        {
-            if (this.IsSited)
-            {
-                this.IsSited = false;
-                this.Style.Padding = this.previousPadding;
-            }
-        }
+        internal bool IsSited { get; private set; }
 
-        internal void Sited()
-        {
-            if (!this.IsSited)
-            {
-                this.IsSited = true;
-                this.previousPadding = this.Style.Padding;
-
-                this.UpdateStyle();
-            }
-        }
-
-        internal void UpdateStyle()
-        {
-            if (this.IsSited == false)
-            {
-                return;
-            }
-
-            Image image = this.OwningNode.Image;
-            if (image != null)
-            {
-                imageWidth = image.Width;
-                imageHeight = image.Height;
-
-            }
-            else
-            {
-                imageWidth = 0;
-                imageHeight = 0;
-            }
-
-            int checkBoxWidth = 0;
-            using (Graphics g = this.OwningNode.Grid.CreateGraphics())
-            {
-                if (this.OwningNode.Grid.ShowCheckBox)
-                {
-                    checkBoxWidth = CheckBoxRenderer.GetGlyphSize(g, CheckBoxState.CheckedNormal).Width;
-                }
-            }
-
-            this.Style.Padding = new Padding(this.previousPadding.Left + (this.Level * INDENT_WIDTH) + imageWidth + checkBoxWidth + INDENT_MARGIN,
-                this.previousPadding.Top, this.previousPadding.Right, this.previousPadding.Bottom);
-        }
+        /// <summary>
+        /// 获取包含此单元格的节点
+        /// </summary>
+        public TreeGridNode OwningNode => OwningRow as TreeGridNode;
 
         public int Level
         {
             get
             {
-                TreeGridNode row = this.OwningNode;
-                if (row != null)
+                TreeGridNode node = OwningNode;
+                if (node != null)
                 {
-                    return row.Level;
+                    return node.Level;
                 }
-                else
-                    return -1;
+
+                return -1;
             }
         }
 
-        private int GlyphMargin
+        private int GlyphMargin => Level * INDENT_WIDTH + INDENT_MARGIN;
+
+        internal void UnSite()
         {
-            get
+            if (IsSited)
             {
-                return ((this.Level - 1) * INDENT_WIDTH) + INDENT_MARGIN;
+                IsSited = false;
+                Style.Padding = _previousPadding;
             }
+        }
+
+        internal void Site()
+        {
+            if (!IsSited)
+            {
+                IsSited = true;
+                _previousPadding = Style.Padding;
+
+                UpdateStyle();
+            }
+        }
+
+        internal void UpdateStyle()
+        {
+            if (IsSited == false)
+            {
+                return;
+            }
+
+            Image image = OwningNode.Image;
+            if (image != null)
+            {
+                _imageWidth = image.Width;
+                _imageHeight = image.Height;
+
+            }
+            else
+            {
+                _imageWidth = 0;
+                _imageHeight = 0;
+            }
+
+            int checkBoxWidth = 0;
+            using (Graphics g = OwningNode.Grid.CreateGraphics())
+            {
+                if (OwningNode.Grid.ShowCheckBox)
+                {
+                    checkBoxWidth = CheckBoxRenderer.GetGlyphSize(g, CheckBoxState.CheckedNormal).Width;
+                }
+            }
+
+            Style.Padding = new Padding(
+                _previousPadding.Left + (Level + 1) * INDENT_WIDTH + _imageWidth + checkBoxWidth + INDENT_MARGIN,
+                _previousPadding.Top,
+                _previousPadding.Right,
+                _previousPadding.Bottom);
         }
 
         protected override void Paint(Graphics graphics, Rectangle clipBounds, Rectangle cellBounds,
@@ -131,12 +128,12 @@ namespace AdvancedDataGridView
             DataGridViewAdvancedBorderStyle advancedBorderStyle, DataGridViewPaintParts paintParts)
         {
 
-            TreeGridNode node = this.OwningNode;
+            TreeGridNode node = OwningNode;
             if (node == null) return;
 
             Image image = node.Image;
 
-            if (this.imageHeight == 0 && image != null) this.UpdateStyle();
+            if (_imageHeight == 0 && image != null) UpdateStyle();
 
             // paint the cell normally
             base.Paint(graphics, clipBounds, cellBounds, rowIndex, cellState, value, formattedValue, errorText, cellStyle, advancedBorderStyle, paintParts);
@@ -150,21 +147,21 @@ namespace AdvancedDataGridView
             }
 
             // TODO: Indent width needs to take image size into account
-            Rectangle glyphRect = new Rectangle(cellBounds.X + this.GlyphMargin, cellBounds.Y, INDENT_WIDTH, cellBounds.Height - 1);
+            Rectangle glyphRect = new Rectangle(cellBounds.X + GlyphMargin, cellBounds.Y, INDENT_WIDTH, cellBounds.Height - 1);
 
             //TODO: Rehash this to take different Imagelayouts into account. This will speed up drawing
             //		for images of the same size (ImageLayout.None)
             if (image != null)
             {
                 Point pp;
-                if (imageHeight > cellBounds.Height)
+                if (_imageHeight > cellBounds.Height)
                     pp = new Point(glyphRect.X + checkBoxWidth + GLYPH_WIDTH, cellBounds.Y);
                 else
-                    pp = new Point(glyphRect.X + checkBoxWidth + GLYPH_WIDTH, (cellBounds.Height / 2 - imageHeight / 2) + cellBounds.Y);
+                    pp = new Point(glyphRect.X + checkBoxWidth + GLYPH_WIDTH, (cellBounds.Height / 2 - _imageHeight / 2) + cellBounds.Y);
 
                 // Graphics container to push/pop changes. This enables us to set clipping when painting
                 // the cell's image -- keeps it from bleeding outsize of cells.
-                System.Drawing.Drawing2D.GraphicsContainer gc = graphics.BeginContainer();
+                GraphicsContainer gc = graphics.BeginContainer();
                 {
                     graphics.SetClip(cellBounds);
                     graphics.DrawImageUnscaled(image, pp);
@@ -177,7 +174,7 @@ namespace AdvancedDataGridView
             {
                 using (Pen linePen = new Pen(SystemBrushes.ControlDark, 1.0f))
                 {
-                    linePen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
+                    linePen.DashStyle = DashStyle.Dot;
                     bool isLastSibling = node.IsLastSibling;
                     bool isFirstSibling = node.IsFirstSibling;
                     // the Root nodes display their lines differently
@@ -185,7 +182,7 @@ namespace AdvancedDataGridView
                     {
                         // only node, both first and last. Just draw horizontal line
                         graphics.DrawLine(linePen, glyphRect.X + 4, cellBounds.Top + cellBounds.Height / 2, glyphRect.Right, cellBounds.Top + cellBounds.Height / 2);
-                        if (node.Parent != null && node.Level > 1)
+                        if (node.ParentNode != null && node.Level > 1)
                         {
                             graphics.DrawLine(linePen, glyphRect.X + 4, cellBounds.Top, glyphRect.X + 4, cellBounds.Top + cellBounds.Height / 2);
                         }
@@ -200,7 +197,7 @@ namespace AdvancedDataGridView
                     {
                         // first sibling doesn't draw the line extended above. Paint horizontal then vertical
                         graphics.DrawLine(linePen, glyphRect.X + 4, cellBounds.Top + cellBounds.Height / 2, glyphRect.Right, cellBounds.Top + cellBounds.Height / 2);
-                        if (node.Parent == null)
+                        if (node.ParentNode == null)
                         {
                             graphics.DrawLine(linePen, glyphRect.X + 4, cellBounds.Top + cellBounds.Height / 2, glyphRect.X + 4, cellBounds.Bottom);
                         }
@@ -216,17 +213,17 @@ namespace AdvancedDataGridView
                         graphics.DrawLine(linePen, glyphRect.X + 4, cellBounds.Top, glyphRect.X + 4, cellBounds.Bottom);
                     }
                     // paint lines of previous levels to the root
-                    TreeGridNode previousNode = node.Parent;
+                    TreeGridNode previousNode = node.ParentNode;
                     int horizontalStop = (glyphRect.X + 4) - INDENT_WIDTH;
 
-                    while (!previousNode.IsRoot)
+                    while (previousNode != null && !previousNode.IsRoot)
                     {
                         if (previousNode.HasChildren && !previousNode.IsLastSibling)
                         {
                             // paint vertical line
                             graphics.DrawLine(linePen, horizontalStop, cellBounds.Top, horizontalStop, cellBounds.Bottom);
                         }
-                        previousNode = previousNode.Parent;
+                        previousNode = previousNode.ParentNode;
                         horizontalStop = horizontalStop - INDENT_WIDTH;
                     }
                 }
@@ -252,40 +249,41 @@ namespace AdvancedDataGridView
         {
             base.OnMouseUp(e);
 
-            TreeGridNode node = this.OwningNode;
+            TreeGridNode node = OwningNode;
             if (node != null)
-                node.Grid.inExpandCollapseMouseCapture = false;
+            {
+                node.Grid.InExpandCollapseMouseCapture = false;
+            }
         }
 
         protected override void OnMouseDown(DataGridViewCellMouseEventArgs e)
         {
-            if (e.Location.X > this.GlyphMargin && e.Location.X < this.GlyphMargin + GLYPH_WIDTH)
+            if (e.Location.X > GlyphMargin && e.Location.X < GlyphMargin + GLYPH_WIDTH)
             {
-                TreeGridNode node = this.OwningNode;
+                TreeGridNode node = OwningNode;
                 if (node != null)
                 {
-                    node.Grid.inExpandCollapseMouseCapture = true;
+                    node.Grid.InExpandCollapseMouseCapture = true;
                     if (node.IsExpanded)
+                    {
                         node.Collapse();
+                    }
                     else
+                    {
                         node.Expand();
+                    }
                 }
             }
-            else if (e.Location.X > this.GlyphMargin + GLYPH_WIDTH && e.Location.X < this.Style.Padding.Left - GLYPH_WIDTH)
+            else if (e.Location.X > GlyphMargin + GLYPH_WIDTH && e.Location.X < Style.Padding.Left - GLYPH_WIDTH)
             {
                 // CheckBox
-                this.OwningNode.IsCheckStateChangedByProgram = true;
-                this.OwningNode.Checked = !this.OwningNode.Checked;
+                OwningNode.IsCheckStateChangedByProgram = true;
+                OwningNode.Checked = !OwningNode.Checked;
             }
             else
             {
                 base.OnMouseDown(e);
             }
-        }
-
-        public TreeGridNode OwningNode
-        {
-            get { return base.OwningRow as TreeGridNode; }
         }
     }
 }

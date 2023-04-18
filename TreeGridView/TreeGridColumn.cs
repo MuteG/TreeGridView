@@ -8,32 +8,30 @@
  *  PARTICULAR PURPOSE.
  * 
  * ------------------------------------------------------------------- */
+
 using System.Drawing;
-using System.Windows.Forms;
 
-namespace AdvancedDataGridView
+namespace System.Windows.Forms
 {
-    public class TreeGridColumn : DataGridViewTextBoxColumn
+    public sealed class TreeGridColumn : DataGridViewTextBoxColumn
     {
-        internal Image _defaultNodeImage;
-
         public TreeGridColumn()
         {
-            this.CellTemplate = new TreeGridCell();
+            CellTemplate = new TreeGridCell();
         }
 
         // Need to override Clone for design-time support.
         public override object Clone()
         {
             TreeGridColumn c = (TreeGridColumn)base.Clone();
-            c._defaultNodeImage = this._defaultNodeImage;
+            if (c != null)
+            {
+                c.DefaultNodeImage = DefaultNodeImage;
+            }
+
             return c;
         }
 
-        public Image DefaultNodeImage
-        {
-            get { return _defaultNodeImage; }
-            set { _defaultNodeImage = value; }
-        }
+        public Image DefaultNodeImage { get; set; }
     }
 }
