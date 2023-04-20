@@ -127,7 +127,8 @@ namespace System.Windows.Forms
             string errorText, DataGridViewCellStyle cellStyle,
             DataGridViewAdvancedBorderStyle advancedBorderStyle, DataGridViewPaintParts paintParts)
         {
-
+            // TODO 正确绘制最后一个节点的连接线
+            // TODO 正确绘制无子节点时的连接线
             TreeGridNode node = OwningNode;
             if (node == null) return;
 
@@ -258,6 +259,12 @@ namespace System.Windows.Forms
 
         protected override void OnMouseDown(DataGridViewCellMouseEventArgs e)
         {
+            if (OwningNode == null)
+            {
+                base.OnMouseDown(e);
+                return;
+            }
+
             if (e.Location.X > GlyphMargin && e.Location.X < GlyphMargin + GLYPH_WIDTH)
             {
                 TreeGridNode node = OwningNode;
@@ -274,11 +281,16 @@ namespace System.Windows.Forms
                     }
                 }
             }
-            else if (e.Location.X > GlyphMargin + GLYPH_WIDTH && e.Location.X < Style.Padding.Left - GLYPH_WIDTH)
+            else if (e.Location.X > GlyphMargin + GLYPH_WIDTH &&
+                     e.Location.X < GlyphMargin + GLYPH_WIDTH + GLYPH_WIDTH)
             {
+                TreeGridNode node = OwningNode;
                 // CheckBox
-                OwningNode.IsCheckStateChangedByProgram = true;
-                OwningNode.Checked = !OwningNode.Checked;
+                if (node.Grid.ShowCheckBox)
+                {
+                    node.IsCheckStateChangedByProgram = true;
+                    node.Checked = !node.Checked;
+                }
             }
             else
             {
