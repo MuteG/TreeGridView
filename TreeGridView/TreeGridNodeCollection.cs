@@ -198,33 +198,39 @@ namespace System.Windows.Forms
         {
             if (Grid == null || Grid.Rows.Contains(node)) return -1;
             var nodeIndex = _list.IndexOf(node);
-            if (nodeIndex < _list.Count - 1)
+            if (nodeIndex == 0)
             {
-                return Grid.Rows.IndexOf(_list[nodeIndex + 1]);
-            }
-            else
-            {
-                if (nodeIndex == 0)
+                if (OwningNode == null)
                 {
-                    if (OwningNode == null)
-                    {
-                        return 0;
-                    }
-                    else
-                    {
-                        return Grid.Rows.IndexOf(OwningNode) + 1;
-                    }
+                    return 0;
                 }
                 else
                 {
-                    return Grid.Rows.IndexOf(_list[nodeIndex - 1]) + 1;
+                    return Grid.Rows.IndexOf(OwningNode) + 1;
                 }
+            }
+            else
+            {
+                var targetNode = _list[nodeIndex - 1];
+                return Grid.Rows.IndexOf(targetNode) + GetChildrenCount(targetNode, true) + 1;
             }
         }
 
         private bool Contains(TreeGridNodeCollection collection, TreeGridNode node)
         {
             return collection.Contains(node) || collection.Any(n => Contains(n.Nodes, node));
+        }
+
+        private int GetChildrenCount(TreeGridNode node, bool recursive)
+        {
+            if (recursive)
+            {
+                return node.Nodes.Count + node.Nodes.Sum(n => GetChildrenCount(n, true));
+            }
+            else
+            {
+                return node.Nodes.Count;
+            }
         }
 
         #endregion

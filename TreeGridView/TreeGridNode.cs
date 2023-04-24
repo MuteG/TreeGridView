@@ -212,13 +212,13 @@ namespace System.Windows.Forms
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool IsFirstSibling => Index == 0;
+        public bool IsFirstSibling => NodeIndex == 0;
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool IsLastSibling =>
-            Index > -1 &&
-            Index == OwningNodeCollection.Count - 1;
+            NodeIndex > -1 &&
+            NodeIndex == OwningNodeCollection.Count - 1;
 
         #region Public Members
 

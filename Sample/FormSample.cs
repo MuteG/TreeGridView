@@ -19,9 +19,12 @@ namespace Sample
 
         private void FormSample_Load(object sender, EventArgs e)
         {
-            var node1 = tgvSample.Nodes.Add("Level 1");
-            var node2_1 = node1.Nodes.Add("Level 2 - 1");
-            var node3_1 = node2_1.Nodes.Add("Level 3 - 1");
+            var node1 = tgvSample.Nodes.Add("Node 1");
+            var node1_1 = node1.Nodes.Add("Node 1 - 1");
+            var node1_1_1 = node1_1.Nodes.Add("Node 1 - 1 - 1");
+            var node1_1_2 = node1_1.Nodes.Add("Node 1 - 1 - 2");
+            var node1_2 = node1.Nodes.Add("Node 1 - 2");
+            var node2 = tgvSample.Nodes.Add("Node 2");
         }
     }
 }

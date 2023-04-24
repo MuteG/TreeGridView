@@ -127,8 +127,6 @@ namespace System.Windows.Forms
             string errorText, DataGridViewCellStyle cellStyle,
             DataGridViewAdvancedBorderStyle advancedBorderStyle, DataGridViewPaintParts paintParts)
         {
-            // TODO 正确绘制最后一个节点的连接线
-            // TODO 正确绘制无子节点时的连接线
             TreeGridNode node = OwningNode;
             if (node == null) return;
 
@@ -154,11 +152,9 @@ namespace System.Windows.Forms
             //		for images of the same size (ImageLayout.None)
             if (image != null)
             {
-                Point pp;
-                if (_imageHeight > cellBounds.Height)
-                    pp = new Point(glyphRect.X + checkBoxWidth + GLYPH_WIDTH, cellBounds.Y);
-                else
-                    pp = new Point(glyphRect.X + checkBoxWidth + GLYPH_WIDTH, (cellBounds.Height / 2 - _imageHeight / 2) + cellBounds.Y);
+                var pp = _imageHeight > cellBounds.Height
+                    ? new Point(glyphRect.X + checkBoxWidth + GLYPH_WIDTH, cellBounds.Y)
+                    : new Point(glyphRect.X + checkBoxWidth + GLYPH_WIDTH, (cellBounds.Height / 2 - _imageHeight / 2) + cellBounds.Y);
 
                 // Graphics container to push/pop changes. This enables us to set clipping when painting
                 // the cell's image -- keeps it from bleeding outsize of cells.
@@ -213,11 +209,12 @@ namespace System.Windows.Forms
                         graphics.DrawLine(linePen, glyphRect.X + 4, cellBounds.Top + cellBounds.Height / 2, glyphRect.Right, cellBounds.Top + cellBounds.Height / 2);
                         graphics.DrawLine(linePen, glyphRect.X + 4, cellBounds.Top, glyphRect.X + 4, cellBounds.Bottom);
                     }
+
                     // paint lines of previous levels to the root
                     TreeGridNode previousNode = node.ParentNode;
-                    int horizontalStop = (glyphRect.X + 4) - INDENT_WIDTH;
+                    int horizontalStop = glyphRect.X + 4 - INDENT_WIDTH;
 
-                    while (previousNode != null && !previousNode.IsRoot)
+                    while (previousNode != null)
                     {
                         if (previousNode.HasChildren && !previousNode.IsLastSibling)
                         {
@@ -225,17 +222,18 @@ namespace System.Windows.Forms
                             graphics.DrawLine(linePen, horizontalStop, cellBounds.Top, horizontalStop, cellBounds.Bottom);
                         }
                         previousNode = previousNode.ParentNode;
-                        horizontalStop = horizontalStop - INDENT_WIDTH;
+                        horizontalStop -= INDENT_WIDTH;
                     }
                 }
             }
 
             if (node.HasChildren || node.Grid.VirtualNodes)
             {
+                var bound = new Rectangle(glyphRect.X, glyphRect.Y + (glyphRect.Height - 10) / 2, 10, 10);
                 if (node.IsExpanded)
-                    RENDERER_OPEN.DrawBackground(graphics, new Rectangle(glyphRect.X, glyphRect.Y + (glyphRect.Height - 10) / 2, 10, 10));
+                    RENDERER_OPEN.DrawBackground(graphics, bound);
                 else
-                    RENDERER_CLOSED.DrawBackground(graphics, new Rectangle(glyphRect.X, glyphRect.Y + (glyphRect.Height - 10) / 2, 10, 10));
+                    RENDERER_CLOSED.DrawBackground(graphics, bound);
             }
 
             if (node.Grid.ShowCheckBox)

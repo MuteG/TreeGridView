@@ -31,7 +31,6 @@ namespace System.Windows.Forms
         private Control _hideScrollBarControl;
         private bool _showLines = true;
         private bool _showCheckBox = true;
-        private bool _virtualNodes;
 
         #region Constructor
         public TreeGridView()
@@ -43,7 +42,7 @@ namespace System.Windows.Forms
             AllowUserToAddRows = false;
             AllowUserToDeleteRows = false;
             MultiSelect = false;
-            _virtualNodes = true;
+            VirtualNodes = false;
             Nodes = new TreeGridNodeCollection(null)
             {
                 Grid = this
@@ -120,13 +119,12 @@ namespace System.Windows.Forms
             }
         }
 
+        /// <summary>
+        /// 获取或设置是否总是显示节点图标（即使不包含子节点）
+        /// </summary>
         [DefaultValue(false),
         Description("Causes nodes to always show as expandable. Use the NodeExpanding event to add nodes.")]
-        public bool VirtualNodes
-        {
-            get { return _virtualNodes; }
-            set { _virtualNodes = value; }
-        }
+        public bool VirtualNodes { get; set; }
 
         public TreeGridNode CurrentNode
         {
