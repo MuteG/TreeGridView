@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ExpandableGridView")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("TreeGridView")]
+[assembly: AssemblyDescription("DataGridView that can expand and collapse is to dynamically show and hide rows.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("ExpandableGridView")]
-[assembly: AssemblyCopyright("Copyright  Microsoft 2004")]
+[assembly: AssemblyCompany("MuteG")]
+[assembly: AssemblyProduct("TreeGridView")]
+[assembly: AssemblyCopyright("Copyright MuteG 2016-2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -30,4 +30,4 @@ using System.Runtime.InteropServices;
 //      Revision
 //
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0")]

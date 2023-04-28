@@ -1,16 +1,7 @@
-﻿//---------------------------------------------------------------------
-// 
-//  Copyright (c) Microsoft Corporation.  All rights reserved.
-// 
-//THIS CODE AND INFORMATION ARE PROVIDED AS IS WITHOUT WARRANTY OF ANY
-//KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-//IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-//PARTICULAR PURPOSE.
-//---------------------------------------------------------------------
-
+﻿using System;
 using System.ComponentModel;
 
-namespace System.Windows.Forms
+namespace TreeGridView
 {
 	public class TreeGridNodeEventBase : EventArgs
 	{
@@ -19,7 +10,7 @@ namespace System.Windows.Forms
 			Node = node;
 		}
 
-		public TreeGridNode Node { get; }
+		public TreeGridNode Node { get; private set; }
     }
 
 	public class CollapsingEventArgs : CancelEventArgs
@@ -28,7 +19,7 @@ namespace System.Windows.Forms
 		{
 			Node = node;
 		}
-		public TreeGridNode Node { get; }
+		public TreeGridNode Node { get; private set; }
     }
 
 	public class CollapsedEventArgs : TreeGridNodeEventBase
@@ -45,7 +36,7 @@ namespace System.Windows.Forms
         {
 			Node = node;
 		}
-		public TreeGridNode Node { get; }
+		public TreeGridNode Node { get; private set; }
     }
 
 	public class ExpandedEventArgs : TreeGridNodeEventBase
@@ -68,7 +59,7 @@ namespace System.Windows.Forms
             IsChangedByProgram = isChangedByProgram;
         }
 
-        public bool IsChangedByProgram { get; }
+        public bool IsChangedByProgram { get; private set; }
     }
 
 	public delegate void ExpandingEventHandler(object sender, ExpandingEventArgs e);

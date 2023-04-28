@@ -1,21 +1,11 @@
-﻿/* ------------------------------------------------------------------
- * 
- *  Copyright (c) Microsoft Corporation.  All rights reserved.
- * 
- *  THIS CODE AND INFORMATION ARE PROVIDED AS IS WITHOUT WARRANTY OF ANY
- *  KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- *  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
- *  PARTICULAR PURPOSE.
- * 
- * ------------------------------------------------------------------- */
-
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Design;
+using System.Windows.Forms;
 
-namespace System.Windows.Forms
+namespace TreeGridView
 {
     [ToolboxItem(false)]
     [DesignTimeVisible(false)]
@@ -37,12 +27,18 @@ namespace System.Windows.Forms
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public TreeGridView Grid => DataGridView as TreeGridView;
+        public TreeGridView Grid
+        {
+            get { return DataGridView as TreeGridView; }
+        }
 
         /// <summary>
         /// 包含此节点的行集合
         /// </summary>
-        public TreeGridViewRowCollection OwningRowCollection => (TreeGridViewRowCollection)Grid?.Rows;
+        public TreeGridViewRowCollection OwningRowCollection
+        {
+            get { return Grid != null ? (TreeGridViewRowCollection)Grid.Rows : null; }
+        }
 
         /// <summary>
         /// 包含此节点的节点集合
@@ -53,21 +49,30 @@ namespace System.Windows.Forms
         /// 此节点的父节点
         /// <para>如果此节点为根节点，则返回 null。</para>
         /// </summary>
-        public TreeGridNode ParentNode => OwningNodeCollection?.OwningNode;
+        public TreeGridNode ParentNode
+        {
+            get { return OwningNodeCollection != null ? OwningNodeCollection.OwningNode : null; }
+        }
 
         /// <summary>
         /// 获取该节点在行集合中位置索引
         /// </summary>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int RowIndex => Index;
+        public int RowIndex
+        {
+            get { return Index; }
+        }
 
         /// <summary>
         /// 获取该节点在节点集合中的位置索引
         /// </summary>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int NodeIndex => OwningNodeCollection?.IndexOf(this) ?? -1;
+        public int NodeIndex
+        {
+            get { return OwningNodeCollection != null ? OwningNodeCollection.IndexOf(this) : -1; }
+        }
 
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -183,9 +188,12 @@ namespace System.Windows.Forms
         [Description("The collection of root nodes in the treelist.")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         [Editor(typeof(CollectionEditor), typeof(UITypeEditor))]
-        public TreeGridNodeCollection Nodes { get; }
+        public TreeGridNodeCollection Nodes { get; private set; }
 
-        internal bool IsRoot => Level == 0;
+        internal bool IsRoot
+        {
+            get { return Level == 0; }
+        }
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -204,7 +212,10 @@ namespace System.Windows.Forms
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool HasChildren => Nodes.Count > 0;
+        public bool HasChildren
+        {
+            get { return Nodes.Count > 0; }
+        }
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -212,13 +223,21 @@ namespace System.Windows.Forms
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool IsFirstSibling => NodeIndex == 0;
+        public bool IsFirstSibling
+        {
+            get { return NodeIndex == 0; }
+        }
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool IsLastSibling =>
-            NodeIndex > -1 &&
-            NodeIndex == OwningNodeCollection.Count - 1;
+        public bool IsLastSibling
+        {
+            get
+            {
+                return NodeIndex > -1 &&
+                       NodeIndex == OwningNodeCollection.Count - 1;
+            }
+        }
 
         #region Public Members
 
@@ -315,7 +334,8 @@ namespace System.Windows.Forms
 
         public override string ToString()
         {
-            return $"TreeGridNode {{ NodeIndex={NodeIndex}, RowIndex={RowIndex}, Level={Level} }}";
+            return string.Format("TreeGridNode {{ NodeIndex={0}, RowIndex={1}, Level={2} }}", NodeIndex, RowIndex,
+                Level);
         }
 
         #endregion

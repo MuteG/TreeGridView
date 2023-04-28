@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.tgvSample = new System.Windows.Forms.TreeGridView();
+            this.tgvSample = new TreeGridView.TreeGridView();
             ((System.ComponentModel.ISupportInitialize)(this.tgvSample)).BeginInit();
             this.SuspendLayout();
             // 
@@ -66,7 +66,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TreeGridView tgvSample;
+        private TreeGridView.TreeGridView tgvSample;
     }
 }
 

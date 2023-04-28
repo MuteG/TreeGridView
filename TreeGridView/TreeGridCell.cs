@@ -1,19 +1,9 @@
-﻿/* ------------------------------------------------------------------
- * 
- *  Copyright (c) Microsoft Corporation.  All rights reserved.
- * 
- *  THIS CODE AND INFORMATION ARE PROVIDED AS IS WITHOUT WARRANTY OF ANY
- *  KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- *  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
- *  PARTICULAR PURPOSE.
- * 
- * ------------------------------------------------------------------- */
-
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 
-namespace System.Windows.Forms
+namespace TreeGridView
 {
     /// <summary>
     /// 用来显示树形结构的单元格
@@ -48,7 +38,10 @@ namespace System.Windows.Forms
         /// <summary>
         /// 获取包含此单元格的节点
         /// </summary>
-        public TreeGridNode OwningNode => OwningRow as TreeGridNode;
+        public TreeGridNode OwningNode
+        {
+            get { return OwningRow as TreeGridNode; }
+        }
 
         public int Level
         {
@@ -64,7 +57,10 @@ namespace System.Windows.Forms
             }
         }
 
-        private int GlyphMargin => Level * INDENT_WIDTH + INDENT_MARGIN;
+        private int GlyphMargin
+        {
+            get { return Level * INDENT_WIDTH + INDENT_MARGIN; }
+        }
 
         internal void UnSite()
         {

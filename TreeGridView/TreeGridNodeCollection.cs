@@ -1,19 +1,8 @@
-﻿/* ------------------------------------------------------------------
- * 
- *  Copyright (c) Microsoft Corporation.  All rights reserved.
- * 
- *  THIS CODE AND INFORMATION ARE PROVIDED AS IS WITHOUT WARRANTY OF ANY
- *  KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- *  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
- *  PARTICULAR PURPOSE.
- * 
- * ------------------------------------------------------------------- */
-
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace System.Windows.Forms
+namespace TreeGridView
 {
 	public class TreeGridNodeCollection : IList<TreeGridNode>
 	{
@@ -31,24 +20,30 @@ namespace System.Windows.Forms
         /// <summary>
         /// 获取包含此单元格的节点
         /// </summary>
-        public TreeGridNode OwningNode { get; }
+        public TreeGridNode OwningNode { get; private set; }
 
         /// <summary>
         /// 包含此节点集合的树形数据表格
         /// </summary>
         internal TreeGridView Grid
         {
-            get => _gird ?? OwningNode?.Grid;
-            set => _gird = value;
+            get { return _gird ?? (OwningNode != null ? OwningNode.Grid : null); }
+            set { _gird = value; }
         }
 
-        public int Count => _list.Count;
+        public int Count
+        {
+            get { return _list.Count; }
+        }
 
-        public bool IsReadOnly => false;
+        public bool IsReadOnly
+        {
+            get { return false; }
+        }
 
         public TreeGridNode this[int index]
         {
-            get => _list[index];
+            get { return _list[index]; }
             set
             {
                 var existNode = _list[index];
@@ -64,7 +59,7 @@ namespace System.Windows.Forms
                 _list[index] = value;
                 AddRow(value);
             }
-        } 
+        }
 
         #endregion
 

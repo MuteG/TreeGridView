@@ -1,19 +1,9 @@
-﻿/* ------------------------------------------------------------------
- * 
- *  Copyright (c) Microsoft Corporation.  All rights reserved.
- * 
- *  THIS CODE AND INFORMATION ARE PROVIDED AS IS WITHOUT WARRANTY OF ANY
- *  KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- *  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
- *  PARTICULAR PURPOSE.
- * 
- * ------------------------------------------------------------------- */
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Forms;
 
-namespace System.Windows.Forms
+namespace TreeGridView
 {
 	public class TreeGridViewRowCollection : DataGridViewRowCollection
 	{
@@ -24,7 +14,10 @@ namespace System.Windows.Forms
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public TreeGridView Grid => DataGridView as TreeGridView;
+        public TreeGridView Grid
+        {
+            get { return DataGridView as TreeGridView; }
+        }
 
         #region Public Members
 

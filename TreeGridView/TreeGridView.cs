@@ -1,20 +1,11 @@
-/* ------------------------------------------------------------------
- * 
- *  Copyright (c) Microsoft Corporation.  All rights reserved.
- * 
- *  THIS CODE AND INFORMATION ARE PROVIDED AS IS WITHOUT WARRANTY OF ANY
- *  KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
- *  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
- *  PARTICULAR PURPOSE.
- * 
- * ------------------------------------------------------------------- */
-
+using System;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing.Design;
+using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
-namespace System.Windows.Forms
+namespace TreeGridView
 {
     /// <summary>
     /// 树形数据表格
@@ -109,7 +100,7 @@ namespace System.Windows.Forms
         Description("The collection of root nodes in the treelist."),
         DesignerSerializationVisibility(DesignerSerializationVisibility.Content),
         Editor(typeof(CollectionEditor), typeof(UITypeEditor))]
-        public TreeGridNodeCollection Nodes { get; }
+        public TreeGridNodeCollection Nodes { get; private set; }
 
         public new TreeGridNode CurrentRow
         {
@@ -277,9 +268,9 @@ namespace System.Windows.Forms
         protected internal virtual void OnNodeChecked(TreeGridNode node, bool isChangedByProgram)
         {
             CheckedEventArgs e = new CheckedEventArgs(node, isChangedByProgram);
-            if (NodeExpanded != null)
+            if (NodeChecked != null)
             {
-                NodeChecked?.Invoke(this, e);
+                NodeChecked(this, e);
             }
         }
         #endregion
